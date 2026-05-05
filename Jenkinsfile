@@ -2,11 +2,16 @@ pipeline {
 
     agent { label 'agent-1' }
 
+    environment {
+        DEPLOY_HOST = "172.31.43.10"
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                git 'YOUR_GITHUB_URL'
+                git branch: 'main',
+                    url: 'https://github.com/Gurraiah123/Auth-project.git'
             }
         }
 
@@ -18,18 +23,23 @@ pipeline {
 
         stage('Deploy') {
             steps {
-
                 sh '''
-                scp target/auth-app-1.0.jar ubuntu@APP_SERVER_PRIVATE_IP:/home/ubuntu/
+                    scp -o StrictHostKeyChecking=no \
+                    target/auth-app-1.0.jar \
+                    ubuntu@${172.31.43.10}:/home/ubuntu/
 
-                ssh ubuntu@APP_SERVER_PRIVATE_IP "
-                    pkill java || true
+                    ssh -o StrictHostKeyChecking=no \
+                    ubuntu@${172.31.43.10} "
 
-                    nohup java -jar /home/ubuntu/auth-app-1.0.jar > app.log 2>&1 &
-                "
+                        pkill -f auth-app-1.0.jar || true
+
+                        nohup java -jar /home/ubuntu/auth-app-1.0.jar \
+                        > /home/ubuntu/app.log 2>&1 &
+                    "
                 '''
             }
         }
 
     }
+
 }
