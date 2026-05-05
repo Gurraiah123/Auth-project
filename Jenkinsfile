@@ -26,11 +26,10 @@ pipeline {
                 sh '''
                     scp -o StrictHostKeyChecking=no \
                     target/auth-app-1.0.jar \
-                    ubuntu@${172.31.43.10}:/home/ubuntu/
+                    ubuntu@$DEPLOY_HOST:/home/ubuntu/
 
                     ssh -o StrictHostKeyChecking=no \
-                    ubuntu@${172.31.43.10} "
-
+                    ubuntu@$DEPLOY_HOST "
                         pkill -f auth-app-1.0.jar || true
 
                         nohup java -jar /home/ubuntu/auth-app-1.0.jar \
